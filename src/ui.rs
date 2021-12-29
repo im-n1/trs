@@ -3,7 +3,7 @@ use std::io::{self, prelude::*, BufRead};
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use chrono::NaiveDateTime;
+use chrono::{Local, NaiveTime};
 use gtfs_structures::{Gtfs, Stop};
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -276,17 +276,21 @@ impl Ui {
             println!("{}", heading);
             println!("{}", "-".repeat(heading.chars().count()));
 
+            let now = Local::now();
+
             // Timetable.
             for departure_record in departure.departures.iter().take(DEPARTURES_COUNT) {
                 if departure_record.stop_time.is_some() {
+                    let departure = NaiveTime::from_num_seconds_from_midnight(
+                        departure_record.stop_time.unwrap(),
+                        0,
+                    );
+
                     println!(
-                        "{} - {}",
+                        "{} - {} (+{} min)",
                         departure_record.route,
-                        NaiveDateTime::from_timestamp(
-                            departure_record.stop_time.unwrap().into(),
-                            0
-                        )
-                        .format("%H:%M")
+                        departure.format("%H:%M"),
+                        (departure - now.time()).num_minutes()
                     );
                 }
             }

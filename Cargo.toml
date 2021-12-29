@@ -19,7 +19,7 @@ serde_yaml = "0.8"
 reqwest = "0.10"
 gtfs-structures = "0.22"
 rayon = "1.5"
-chrono = {version = "0.4", features = ["serde"] }
+chrono = {version = "^0.4.2", features = ["serde"] }
 itertools = "0.8"
 spinners = "1.2.0"
 clap = {version = "2.33", feature = ["color"]}

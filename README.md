@@ -20,6 +20,11 @@ When you run the app for the first time a wizard will welcome you and
 walk you thru the setup process. All you need is GTFS file URL or location
 on your drive.
 
+Such GTFS file can be found on the internet on your local transporation company
+website. Apps like [Citymapper](https://citymapper.com/) uses exactly these
+files. There is also [this](https://transitfeeds.com/) portal where you can try
+to find your city.
+
 ### Print timetables
 
 Except wiping (`-w`) the app always prints out the timetables of your stations.
@@ -29,9 +34,9 @@ $ trs
 
 Skloněná -> Sídliště Čakovice
 -----------------------------
-136 - 20:53
-136 - 21:11
-136 - 21:31
+136 - 13:20 (+14 min)
+136 - 13:35 (+29 min)
+136 - 13:50 (+44 min)
 ```
 
 ### Refreshing database
@@ -57,6 +62,12 @@ $ trs -w  # wipes whole app database - cannot be undone.
 ```
 
 ## Changelog
+
+### 0.1.1
+
+- added relative times
+- added a few words about GTFS to README filte
+- updated dependencies
 
 ### 0.1
 
