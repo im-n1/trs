@@ -1,6 +1,6 @@
 [package]
 name = "transpors"
-version = "0.1.0"
+version = "0.1.2"
 authors = ["n1 <hrdina.pavel@gmail.com>"]
 edition = "2021"
 
@@ -17,7 +17,7 @@ async-trait = "*"
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_yaml = "0.8"
 reqwest = "0.10"
-gtfs-structures = "0.22"
+gtfs-structures = "0.30"
 rayon = "1.5"
 chrono = {version = "^0.4.2", features = ["serde"] }
 itertools = "0.8"

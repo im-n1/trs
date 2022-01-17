@@ -82,7 +82,7 @@ impl<'a> Wizard<'a> {
         println!(" done!");
 
         // Spinner - start.
-        let sp = Spinner::new(Spinners::Line, "Parsing (can take minutes)".into());
+        let sp = Spinner::new(Spinners::Line, "Parsing (can take seconds)".into());
         io::stdout().flush().unwrap();
 
         // Parse.
@@ -90,7 +90,7 @@ impl<'a> Wizard<'a> {
 
         // Spinner - stop.
         sp.stop();
-        println!("Done!");
+        println!(" Done!");
 
         Ok(gtfs)
     }
@@ -265,7 +265,11 @@ impl Ui {
     /// 913 - 23:58
     /// 903 - 00:15
     ///
-    fn print_default(&self, departures: Vec<Departure>) {
+    fn print_default(&self, mut departures: Vec<Departure>) {
+
+        // Sort  by stop name.
+        departures.sort_by(|a, b| a.stop.name.partial_cmp(&b.stop.name).unwrap());
+
         for departure in departures.iter() {
             // Heading.
             let heading = format!(

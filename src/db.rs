@@ -70,7 +70,7 @@ impl<'a> Database {
     fn fetch(gtfs: &'a Gtfs, stop: Arc<Stop>) -> Result<Vec<Record>, Box<dyn std::error::Error>> {
         let records = Arc::new(Mutex::new(vec![]));
 
-        let sp = Spinner::new(Spinners::Line, "Fetching times (can take minutes)".into());
+        let sp = Spinner::new(Spinners::Line, "Fetching times (can take seconds)".into());
 
         gtfs.routes.par_iter().for_each(|(_, route)| {
             let records = Arc::clone(&records);

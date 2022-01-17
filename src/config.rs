@@ -147,11 +147,11 @@ impl Config {
         println!(" done!");
 
         // 2. parse
-        let sp = Spinner::new(Spinners::Line, "Parsing (can take minutes)".into());
+        let sp = Spinner::new(Spinners::Line, "Parsing (can take seconds)".into());
         io::stdout().flush().unwrap();
         let gtfs = df.parse()?;
         sp.stop();
-        println!("Done!");
+        println!(" Done!");
 
         // 3. build database.
         self.stops = Config::build_stops_database(&gtfs, &self.user_stops).await;

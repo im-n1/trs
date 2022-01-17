@@ -3,7 +3,7 @@ use clap::{App, AppSettings, Arg, ArgMatches};
 pub fn parse() -> ArgMatches<'static> {
     App::new("TranspoRS")
         .setting(AppSettings::ColoredHelp)
-        .version("0.1.0")
+        .version("0.1.2")
         .author("Hrdina Pavel <hrdina.pavel@gmail.com>")
         .about("Transportation timetables for command line.")
         .arg(

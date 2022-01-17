@@ -63,6 +63,12 @@ $ trs -w  # wipes whole app database - cannot be undone.
 
 ## Changelog
 
+### 0.1.2
+
+- timetables are now sorted by stop name
+- dependencies bumped to newer versions which brings notably better performance
+- ! you need to rebuild your database after this update
+
 ### 0.1.1
 
 - added relative times
