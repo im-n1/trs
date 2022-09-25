@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use serde_yaml;
 use spinners::{Spinner, Spinners};
 use tokio::fs::{self, File};
-use tokio::prelude::*;
+use tokio::io::AsyncReadExt;
 
 use crate::app::{ArgSignal, ArgumentProcessResult};
 use crate::db::{DataFile, Database};
@@ -119,6 +119,7 @@ impl Config {
     /// Builds up stop database for each stop from config.
     async fn build_stops_database(gtfs: &Gtfs, stops: &Vec<FoundStop>) -> Vec<Stop> {
         let mut processed_stops = vec![];
+        let mut sp = Spinner::new(Spinners::Line, "fetching times...".into());
 
         // TODO: implement rayon
         for found_stop in stops {
@@ -132,6 +133,9 @@ impl Config {
             });
         }
 
+        sp.stop();
+        println!("done");
+
         processed_stops
     }
 
@@ -141,17 +145,27 @@ impl Config {
     async fn refresh_data_file(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // 1. download
         let df = DataFile::new(&Self::determine_conf_dir(), self.data_file_url.clone());
-        print!("Retrieving ...");
+
+        // Spinner - start.
+        let mut sp = Spinner::new(Spinners::Line, "retrieving...".into());
         io::stdout().flush()?;
+
         df.retrieve().await?;
-        println!(" done!");
+
+        // Spinner - stop.
+        sp.stop();
+        println!("done");
 
         // 2. parse
-        let sp = Spinner::new(Spinners::Line, "Parsing (can take seconds)".into());
-        io::stdout().flush().unwrap();
+        // Spinner - start.
+        let mut sp = Spinner::new(Spinners::Line, "parsing...".into());
+        // io::stdout().flush().unwrap();
+
         let gtfs = df.parse()?;
+
+        // Spinner - stop.
         sp.stop();
-        println!(" Done!");
+        println!("done");
 
         // 3. build database.
         self.stops = Config::build_stops_database(&gtfs, &self.user_stops).await;
@@ -172,14 +186,14 @@ impl Config {
     fn get_gtfs_file(&self) -> Result<Gtfs, Box<dyn std::error::Error>> {
         let conf_dir = Self::determine_conf_dir();
         let df = DataFile::new(&conf_dir, self.data_file_url.clone());
-        let sp = Spinner::new(
+        let mut sp = Spinner::new(
             Spinners::Line,
-            "Parsing data file (can take minutes)".into(),
+            "parsing data file (can take minutes)...".into(),
         );
         io::stdout().flush().unwrap();
         let gtfs = df.parse()?;
         sp.stop();
-        println!("Done!");
+        println!("done");
 
         Ok(gtfs)
     }
@@ -194,7 +208,7 @@ impl ArgSignal for Config {
     /// -w
     async fn processs_args(
         &mut self,
-        args: ArgMatches<'_>,
+        args: ArgMatches,
     ) -> Result<ArgumentProcessResult, Box<dyn std::error::Error>> {
         // -r argument
         if args.is_present("refresh") {

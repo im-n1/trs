@@ -9,7 +9,6 @@ use gtfs_structures::{Gtfs, Stop, Trip};
 use rayon::prelude::*;
 use reqwest;
 use serde::{Deserialize, Serialize};
-use spinners::{Spinner, Spinners};
 use tokio::fs;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -70,8 +69,6 @@ impl<'a> Database {
     fn fetch(gtfs: &'a Gtfs, stop: Arc<Stop>) -> Result<Vec<Record>, Box<dyn std::error::Error>> {
         let records = Arc::new(Mutex::new(vec![]));
 
-        let sp = Spinner::new(Spinners::Line, "Fetching times (can take seconds)".into());
-
         gtfs.routes.par_iter().for_each(|(_, route)| {
             let records = Arc::clone(&records);
 
@@ -96,8 +93,6 @@ impl<'a> Database {
                 }
             }
         });
-
-        sp.stop();
 
         Ok(Mutex::into_inner(Arc::try_unwrap(records).unwrap()).unwrap())
     }

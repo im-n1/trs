@@ -75,14 +75,19 @@ impl<'a> Wizard<'a> {
         // Play with datafile.
         let df = DataFile::new(self.conf_dir, data_file);
 
+        // Spinner - start.
+        let mut sp = Spinner::new(Spinners::Line, "fetching times...".into());
+        // io::stdout().flush()?;
+
         // Retrieve data file.
-        print!("Retrieving ...");
-        io::stdout().flush()?;
         self.data_file_path = Some(df.retrieve().await?);
-        println!(" done!");
+
+        // Spinner - stop.
+        sp.stop();
+        println!("done");
 
         // Spinner - start.
-        let sp = Spinner::new(Spinners::Line, "Parsing (can take seconds)".into());
+        let mut sp = Spinner::new(Spinners::Line, "parsing...".into());
         io::stdout().flush().unwrap();
 
         // Parse.
@@ -90,7 +95,7 @@ impl<'a> Wizard<'a> {
 
         // Spinner - stop.
         sp.stop();
-        println!(" Done!");
+        println!("done!");
 
         Ok(gtfs)
     }
@@ -266,7 +271,6 @@ impl Ui {
     /// 903 - 00:15
     ///
     fn print_default(&self, mut departures: Vec<Departure>) {
-
         // Sort  by stop name.
         departures.sort_by(|a, b| a.stop.name.partial_cmp(&b.stop.name).unwrap());
 

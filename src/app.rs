@@ -23,12 +23,12 @@ pub enum ArgumentProcessResult {
 pub trait ArgSignal {
     async fn processs_args(
         &mut self,
-        args: ArgMatches<'_>,
+        args: ArgMatches,
     ) -> Result<ArgumentProcessResult, Box<dyn std::error::Error>>;
 }
 
 impl App {
-    pub async fn run(args: ArgMatches<'_>) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn run(args: ArgMatches) -> Result<(), Box<dyn std::error::Error>> {
         // Create/get config (also handles first start).
         let mut config = Rc::new(Config::new().await?);
 
