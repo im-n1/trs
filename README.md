@@ -1,10 +1,10 @@
-# TranspoRS
+# TRS 
 
 Transportation timetambles for command line.
 
 ![example](./assets/example.png)
 
-# Installation
+## Installation
 
 ```
 cargo install --git https://github.com/im-n1/transpors
@@ -62,6 +62,11 @@ $ trs -w  # wipes whole app database - cannot be undone.
 ```
 
 ## Changelog
+
+### 0.1.3
+
+- log messages (CLI output) unified
+- dependencies bumped to newer versions
 
 ### 0.1.2
 
