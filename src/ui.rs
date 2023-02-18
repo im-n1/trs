@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use chrono::{Local, NaiveTime};
+use clap::ArgMatches;
 use gtfs_structures::{Gtfs, Stop};
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -11,9 +12,6 @@ use spinners::{Spinner, Spinners};
 
 use crate::db::DataFile;
 use crate::timetables::Departure;
-
-/// Default limit for departures to be printed out.
-const DEPARTURES_COUNT: usize = 3;
 
 pub struct WizardOutput {
     pub gtfs: Gtfs,
@@ -252,12 +250,32 @@ impl<'a> Wizard<'a> {
     }
 }
 
-pub struct Ui;
+pub struct UiConfig {
+    limit: usize,
+}
+
+pub struct Ui {
+    config: UiConfig,
+}
 
 impl Ui {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(args: ArgMatches) -> Self {
+        Self {
+            config: Ui::process_args(args),
+        }
     }
+
+    pub fn process_args(args: ArgMatches) -> UiConfig {
+        // -l argument
+        let limit = args
+            .get_one::<String>("limit")
+            .unwrap()
+            .parse::<usize>()
+            .unwrap();
+
+        UiConfig { limit }
+    }
+
     pub fn output(&self, departures: Vec<Departure>) {
         self.print_default(departures)
     }
@@ -287,7 +305,7 @@ impl Ui {
             let now = Local::now();
 
             // Timetable.
-            for departure_record in departure.departures.iter().take(DEPARTURES_COUNT) {
+            for departure_record in departure.departures.iter().take(self.config.limit.clone()) {
                 if departure_record.stop_time.is_some() {
                     let departure = NaiveTime::from_num_seconds_from_midnight(
                         departure_record.stop_time.unwrap(),

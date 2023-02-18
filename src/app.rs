@@ -36,7 +36,7 @@ impl App {
         // Process all arguments.
         let result = Rc::get_mut(&mut config)
             .unwrap()
-            .processs_args(args)
+            .processs_args(args.clone())
             .await?;
 
         if let ArgumentProcessResult::Continue = result {
@@ -46,7 +46,7 @@ impl App {
             let departures = timetables.get_departures();
 
             // Render timetables.
-            Ui::new().output(departures);
+            Ui::new(args.clone()).output(departures);
         }
 
         Ok(())

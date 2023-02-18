@@ -63,6 +63,10 @@ $ trs -w  # wipes whole app database - cannot be undone.
 
 ## Changelog
 
+### 0.1.4
+
+- added `-l` param for better peek to the future
+
 ### 0.1.3
 
 - log messages (CLI output) unified

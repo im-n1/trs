@@ -206,6 +206,7 @@ impl ArgSignal for Config {
     /// -a
     /// -d
     /// -w
+    /// -l
     async fn processs_args(
         &mut self,
         args: ArgMatches,

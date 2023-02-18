@@ -1,5 +1,8 @@
 use clap::{App, AppSettings, Arg, ArgMatches};
 
+/// Default limit for departures to be printed out.
+const DEPARTURES_COUNT: &str = "3";
+
 pub fn parse() -> ArgMatches {
     App::new("TranspoRS")
         .setting(AppSettings::ColoredHelp)
@@ -25,6 +28,13 @@ pub fn parse() -> ArgMatches {
             Arg::with_name("wipe")
                 .short('w')
                 .help("Wipes whole config. Cannot be undone, be careful."),
+        )
+        .arg(
+            Arg::with_name("limit")
+                .short('l')
+                .takes_value(true)
+                .default_value(DEPARTURES_COUNT)
+                .help("Limits number of departures from each stop."),
         )
         .get_matches()
 }
