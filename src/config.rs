@@ -5,7 +5,6 @@ use async_trait::async_trait;
 use clap::ArgMatches;
 use gtfs_structures::Gtfs;
 use serde::{Deserialize, Serialize};
-use serde_yaml;
 use spinners::{Spinner, Spinners};
 use tokio::fs::{self, File};
 use tokio::io::AsyncReadExt;
@@ -49,7 +48,7 @@ impl Config {
 
             config = Self {
                 data_file_url: wiz.data_file_url.unwrap(),
-                data_file_path: wiz.data_file_path.unwrap().clone(),
+                data_file_path: wiz.data_file_path.unwrap(),
                 user_stops: output.stops,
                 stops,
             };
@@ -124,7 +123,7 @@ impl Config {
         // TODO: implement rayon
         for found_stop in stops {
             // TODO: remove unwrap set up error.
-            let database = Database::from(&gtfs, found_stop.stop.clone()).unwrap();
+            let database = Database::from(gtfs, found_stop.stop.clone()).unwrap();
             processed_stops.push(Stop {
                 id: found_stop.id.clone(),
                 name: found_stop.stop.name.clone(),
@@ -262,11 +261,9 @@ impl ArgSignal for Config {
         }
 
         // -w argument
-        if args.is_present("wipe") {
-            if Ui::confirm("Do you want to wipe whole app config?") {
-                self.wipe().await?;
-                return Ok(ArgumentProcessResult::Stop);
-            }
+        if args.is_present("wipe") && Ui::confirm("Do you want to wipe whole app config?") {
+            self.wipe().await?;
+            return Ok(ArgumentProcessResult::Stop);
         }
 
         Ok(ArgumentProcessResult::Continue)

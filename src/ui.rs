@@ -153,7 +153,7 @@ impl<'a> Wizard<'a> {
             );
 
             if stop.is_ok() {
-                return Ok(stop.unwrap().clone());
+                return stop.cloned();
             }
             // Print stops.
             // for (i, chosen_stop) in found_stops_with_terminating_stop.iter().enumerate() {
@@ -190,7 +190,7 @@ impl<'a> Wizard<'a> {
 
     /// Asks user for input and then finds similar stops in datafile.
     /// All similar stops are then returned.
-    /// If no similar stop are found user is asked for the input again.
+    /// If no similar stops are found user is asked for the input again.
     fn seek_stops(
         &self,
         gtfs: &'a Gtfs,
@@ -298,14 +298,14 @@ impl Ui {
                 "{} -> {}",
                 departure.stop.name, &departure.stop.terminating_stop
             );
-            println!("");
+            println!();
             println!("{}", heading);
             println!("{}", "-".repeat(heading.chars().count()));
 
             let now = Local::now();
 
             // Timetable.
-            for departure_record in departure.departures.iter().take(self.config.limit.clone()) {
+            for departure_record in departure.departures.iter().take(self.config.limit) {
                 if departure_record.stop_time.is_some() {
                     let departure = NaiveTime::from_num_seconds_from_midnight(
                         departure_record.stop_time.unwrap(),
@@ -327,7 +327,7 @@ impl Ui {
     /// user choose one stop which is then returned
     pub fn select_stop<'a>(
         prompt: &str,
-        stops: &'a Vec<FoundStop>,
+        stops: &'a [FoundStop],
     ) -> Result<&'a FoundStop, Box<dyn std::error::Error>> {
         // 1. print stop choices.
         for (i, stop) in stops.iter().enumerate() {
@@ -341,10 +341,10 @@ impl Ui {
             io::stdin().lock().read_line(&mut the_stop_number_input)?;
 
             if let Ok(the_stop_index) = the_stop_number_input.trim().parse::<usize>() {
-                let the_stop = stops.iter().nth(the_stop_index);
+                let the_stop = stops.get(the_stop_index);
 
-                if the_stop.is_some() {
-                    return Ok(the_stop.unwrap());
+                if let Some(val) = the_stop {
+                    return Ok(val);
                 }
             }
 
@@ -366,19 +366,17 @@ impl Ui {
     /// Prints confirm dialog where "y" answer confirms and anything else denies
     /// the request.
     pub fn confirm(msg: &str) -> bool {
-        loop {
-            print!("{}", msg);
-            println!(" (y/n)");
+        print!("{}", msg);
+        println!(" (y/n)");
 
-            let mut answer = String::new();
-            io::stdin().lock().read_line(&mut answer).unwrap();
-            answer = answer.trim().to_owned();
+        let mut answer = String::new();
+        io::stdin().lock().read_line(&mut answer).unwrap();
+        answer = answer.trim().to_owned();
 
-            if "y" == answer.to_lowercase() {
-                return true;
-            }
-
-            return false;
+        if "y" == answer.to_lowercase() {
+            return true;
         }
+
+        false
     }
 }

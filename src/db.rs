@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -7,7 +7,6 @@ use std::{
 use chrono::NaiveDate;
 use gtfs_structures::{Gtfs, Stop, Trip};
 use rayon::prelude::*;
-use reqwest;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
@@ -27,15 +26,15 @@ pub struct CustomCalendar {
 impl From<&gtfs_structures::Calendar> for CustomCalendar {
     fn from(cal: &gtfs_structures::Calendar) -> Self {
         Self {
-            monday: cal.monday.clone(),
-            tuesday: cal.tuesday.clone(),
-            wednesday: cal.wednesday.clone(),
-            thursday: cal.thursday.clone(),
-            friday: cal.friday.clone(),
-            saturday: cal.saturday.clone(),
-            sunday: cal.sunday.clone(),
-            start_date: cal.start_date.clone(),
-            end_date: cal.end_date.clone(),
+            monday: cal.monday,
+            tuesday: cal.tuesday,
+            wednesday: cal.wednesday,
+            thursday: cal.thursday,
+            friday: cal.friday,
+            saturday: cal.saturday,
+            sunday: cal.sunday,
+            start_date: cal.start_date,
+            end_date: cal.end_date,
         }
     }
 }
@@ -86,7 +85,7 @@ impl<'a> Database {
                             calendar: CustomCalendar::from(
                                 gtfs.get_calendar(trip.service_id.as_str()).unwrap(),
                             ),
-                            stop_time: time.arrival_time.clone(),
+                            stop_time: time.arrival_time,
                             stop: time.stop.name.clone(),
                         });
                     }
@@ -106,8 +105,8 @@ pub struct DataFile {
 
 impl DataFile {
     /// Constructor.
-    pub fn new(conf_dir: &PathBuf, remote_location: String) -> Self {
-        let mut local_location = conf_dir.clone();
+    pub fn new(conf_dir: &Path, remote_location: String) -> Self {
+        let mut local_location = conf_dir.to_path_buf();
         local_location.push("data_file.gtfs");
 
         Self {

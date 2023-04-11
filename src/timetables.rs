@@ -25,7 +25,7 @@ impl<'a> Timetables {
         for stop in self.config.stops.iter() {
             departures.push(Departure {
                 stop,
-                departures: self.get_next_departures(&stop),
+                departures: self.get_next_departures(stop),
             });
         }
 
@@ -64,11 +64,10 @@ impl<'a> Timetables {
                         return true;
                     }
 
-                    return NaiveTime::from_num_seconds_from_midnight(timestamp.into(), 0)
-                        .ge(&now.time());
+                    return NaiveTime::from_num_seconds_from_midnight(timestamp, 0).ge(&now.time());
                 }
 
-                return false;
+                false
             })
             // Filter for week day.
             .filter(|r| match now.weekday() {
