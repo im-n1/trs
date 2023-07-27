@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 use async_trait::async_trait;
 use clap::ArgMatches;
+use derivative::Derivative;
 use gtfs_structures::Gtfs;
 use serde::{Deserialize, Serialize};
 use spinners::{Spinner, Spinners};
@@ -16,11 +17,13 @@ use crate::ui::{FoundStop, Ui, Wizard};
 const CONF_DIR: &str = "transpors";
 const CONF_FILE: &str = "config.yaml";
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Derivative)]
+#[derivative(Debug)]
 pub struct Stop {
     id: String,
     pub name: String,
     pub terminating_stop: String,
+    #[derivative(Debug = "ignore")]
     pub database: Database,
 }
 

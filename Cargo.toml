@@ -16,10 +16,17 @@ tokio = { version = "1.2", features = ["full"] }
 async-trait = "*"
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_yaml = "0.9"
-reqwest = "0.11"
+serde_json = { version = "1.0", optional = true }
+reqwest = { version = "0.11", features = ["json"] }
 gtfs-structures = "0.32"
 rayon = "1.5"
 chrono = {version = "^0.4.2", features = ["serde"] }
-itertools = "0.10"
+itertools = "0.11"
 spinners = "4.1.0"
 clap = {version = "3.2", feature = ["color"]}
+futures = {version = "0.3", optional = true}
+strfmt = "0.2"
+derivative = "*"
+
+[features]
+prague = ["dep:futures", "dep:serde_json"]

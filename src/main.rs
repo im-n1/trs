@@ -2,6 +2,7 @@ mod app;
 mod args;
 mod config;
 mod db;
+mod features;
 mod timetables;
 mod ui;
 

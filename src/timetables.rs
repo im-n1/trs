@@ -5,9 +5,10 @@ use crate::config::Config;
 use crate::config::Stop;
 use crate::db::Record;
 
+#[derive(Debug)]
 pub struct Departure<'a> {
     pub stop: &'a Stop,
-    pub departures: Vec<&'a Record>,
+    pub departures: Vec<Record>,
 }
 
 pub struct Timetables {
@@ -33,7 +34,7 @@ impl<'a> Timetables {
     }
 
     // TODO: async
-    fn get_next_departures(&self, stop: &'a Stop) -> Vec<&'a Record> {
+    fn get_next_departures(&self, stop: &'a Stop) -> Vec<Record> {
         let now = Local::now();
         let date = now.date().naive_utc();
 
@@ -79,7 +80,8 @@ impl<'a> Timetables {
                 Weekday::Sat => r.calendar.saturday,
                 Weekday::Sun => r.calendar.sunday,
             })
-            .collect::<Vec<&Record>>();
+            .cloned()
+            .collect::<Vec<Record>>();
 
         // Sort by stop time (arrival time).
         filtered_and_sorted.sort_by_key(|r| r.stop_time);

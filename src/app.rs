@@ -46,7 +46,7 @@ impl App {
             let departures = timetables.get_departures();
 
             // Render timetables.
-            Ui::new(args.clone()).output(departures);
+            Ui::new(args.clone()).output(departures).await;
         }
 
         Ok(())

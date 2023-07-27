@@ -21,7 +21,7 @@ walk you thru the setup process. All you need is GTFS file URL or location
 on your drive.
 
 Such GTFS file can be found on the internet on your local transporation company
-website. Apps like [Citymapper](https://citymapper.com/) uses exactly these
+website. Apps like [Citymapper](https://citymapper.com/) use exactly these
 files. There is also [this](https://transitfeeds.com/) portal where you can try
 to find your city.
 
@@ -61,7 +61,26 @@ $ trs -d  # to delete existing stops
 $ trs -w  # wipes whole app database - cannot be undone.
 ```
 
+### Features
+
+#### prague
+This feature adds live delays and air-condition info to each connection (departure)
+
+![example prague](./assets/example_prague.png)
+
+Instalation is simple - just activate feature `prague` with `-F prague` in `cargo
+install command`.
+
+This feature uses [Golemi API](https://api.golemio.cz/v2/pid/docs/openapi/)
+where you need to [register](https://api.golemio.cz/api-keys/auth/sign-in)
+to generate API key.
+
 ## Changelog
+
+### 0.1.5
+
+- added `prague` feature which enables live delays and air-condition info
+- it's necessary to wipe and rebuild whole database - `-w` param
 
 ### 0.1.4
 

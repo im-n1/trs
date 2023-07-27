@@ -1,6 +1,7 @@
 use std::fmt::{self, Display};
 use std::io::{self, prelude::*, BufRead};
 use std::path::PathBuf;
+use std::rc::Rc;
 use std::sync::Arc;
 
 use chrono::{Local, NaiveTime};
@@ -11,6 +12,10 @@ use serde::{Deserialize, Serialize};
 use spinners::{Spinner, Spinners};
 
 use crate::db::DataFile;
+#[cfg(feature = "prague")]
+use crate::db::Record;
+#[cfg(feature = "prague")]
+use crate::features::prague;
 use crate::timetables::Departure;
 
 pub struct WizardOutput {
@@ -255,13 +260,13 @@ pub struct UiConfig {
 }
 
 pub struct Ui {
-    config: UiConfig,
+    config: Rc<UiConfig>,
 }
 
 impl Ui {
     pub fn new(args: ArgMatches) -> Self {
         Self {
-            config: Ui::process_args(args),
+            config: Rc::new(Ui::process_args(args)),
         }
     }
 
@@ -276,23 +281,25 @@ impl Ui {
         UiConfig { limit }
     }
 
-    pub fn output(&self, departures: Vec<Departure>) {
-        self.print_default(departures)
+    pub async fn output(&self, departures: Vec<Departure<'_>>) {
+        // dbg!(&departures);
+
+        self.print_default(departures).await
     }
 
     /// Prints departures in default format:
     ///
     /// Novovysočanská -> Sídliště Čakovice
     /// -----------------------------------
-    /// 903 - 23:15
-    /// 913 - 23:58
-    /// 903 - 00:15
+    /// 109 - 15:33 (+10 min)
+    /// 109 - 15:45 (+22 min)
+    /// 109 - 15:57 (+34 min)
     ///
-    fn print_default(&self, mut departures: Vec<Departure>) {
+    async fn print_default(&self, mut departures: Vec<Departure<'_>>) {
         // Sort  by stop name.
         departures.sort_by(|a, b| a.stop.name.partial_cmp(&b.stop.name).unwrap());
 
-        for departure in departures.iter() {
+        for departure in departures.iter_mut() {
             // Heading.
             let heading = format!(
                 "{} -> {}",
@@ -304,22 +311,67 @@ impl Ui {
 
             let now = Local::now();
 
+            // Check if limit is greater than actual departures count.
+            let limit = if departure.departures.len() < self.config.limit {
+                departure.departures.len()
+            } else {
+                self.config.limit
+            };
+
+            #[cfg(feature = "prague")]
+            let deps_slice = &mut departure.departures[..limit];
+            #[cfg(feature = "prague")]
+            prague::spice_up_departures(Rc::clone(&self.config), deps_slice).await;
+
             // Timetable.
-            for departure_record in departure.departures.iter().take(self.config.limit) {
+            for departure_record in departure.departures[..limit].iter() {
                 if departure_record.stop_time.is_some() {
+                    // Is the departure time "next day"? - means the departure
+                    // seconds are greater than 86400 seconds.
+                    let mut next_day = false;
                     let departure = NaiveTime::from_num_seconds_from_midnight(
-                        departure_record.stop_time.unwrap(),
+                        if 60 * 60 * 24 < departure_record.stop_time.unwrap() {
+                            next_day = true;
+                            departure_record.stop_time.unwrap() - 60 * 60 * 24
+                        } else {
+                            departure_record.stop_time.unwrap()
+                        },
                         0,
                     );
 
+                    #[cfg(not(feature = "prague"))]
+                    let additional = String::new();
+                    #[cfg(feature = "prague")]
+                    let mut additional = String::new();
+
+                    #[cfg(feature = "prague")]
+                    self.format_additionals(departure_record, &mut additional);
+
                     println!(
-                        "{} - {} (+{} min)",
+                        "{} - {} (in {} min){}",
                         departure_record.route,
                         departure.format("%H:%M"),
-                        (departure - now.time()).num_minutes()
+                        {
+                            // In case of "next day" departure we need to add one day.
+                            let mut x = departure - now.time();
+
+                            if next_day {
+                                x = x + chrono::Duration::days(1)
+                            }
+
+                            x.num_minutes()
+                        },
+                        additional
                     );
                 }
             }
+        }
+    }
+
+    #[cfg(feature = "prague")]
+    fn format_additionals(&self, record: &Record, additional: &mut String) {
+        if let Some(add) = record.additionals {
+            additional.push_str(add.to_string().as_str());
         }
     }
 

@@ -503,7 +503,7 @@ dependencies = [
  "csv",
  "derivative",
  "futures",
- "itertools",
+ "itertools 0.10.3",
  "reqwest",
  "rgb",
  "serde",
@@ -665,6 +665,15 @@ name = "itertools"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a9a9d19fa1e79b6215ff29b9d6880b706147f16e9b1dbb1e4e5947b5b02bc5e3"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
 dependencies = [
  "either",
 ]
@@ -1218,6 +1227,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "strfmt"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a8348af2d9fc3258c8733b8d9d8db2e56f54b2363a4b5b81585c7875ed65e65"
+
+[[package]]
 name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1417,14 +1432,18 @@ dependencies = [
  "async-trait",
  "chrono",
  "clap",
+ "derivative",
  "dirs",
+ "futures",
  "gtfs-structures",
- "itertools",
+ "itertools 0.11.0",
  "rayon",
  "reqwest",
  "serde",
+ "serde_json",
  "serde_yaml",
  "spinners",
+ "strfmt",
  "tokio",
 ]
 

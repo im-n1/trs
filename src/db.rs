@@ -4,13 +4,15 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+#[cfg(feature = "prague")]
+use crate::features::prague::Additional;
 use chrono::NaiveDate;
 use gtfs_structures::{Gtfs, Stop, Trip};
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CustomCalendar {
     pub monday: bool,
     pub tuesday: bool,
@@ -39,16 +41,21 @@ impl From<&gtfs_structures::Calendar> for CustomCalendar {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Record {
     pub route: String, // human readable line name
+    // pub route_id: String,
     pub trip: String,
+    pub trip_id: String,
     pub calendar: CustomCalendar,
     pub stop_time: Option<u32>,
     pub stop: String,
+    #[cfg(feature = "prague")]
+    #[serde(skip)]
+    pub additionals: Option<Additional>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Database {
     // TODO: vec -> array
     pub records: Vec<Record>,
@@ -81,12 +88,16 @@ impl<'a> Database {
                     if time.stop.id == stop.id {
                         records.lock().unwrap().push(Record {
                             route: route.short_name.clone(),
+                            // route_id: route.id.clone(),
                             trip: trip.service_id.clone(),
+                            trip_id: trip.id.clone(),
                             calendar: CustomCalendar::from(
                                 gtfs.get_calendar(trip.service_id.as_str()).unwrap(),
                             ),
                             stop_time: time.arrival_time,
                             stop: time.stop.name.clone(),
+                            #[cfg(feature = "prague")]
+                            additionals: None,
                         });
                     }
                 }
